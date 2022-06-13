@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+nodes = {
+    'github.com/yann-y/ipfs-s3' => [1, 100],
+}
+
+Vagrant.configure("2") do |config|
+
+    nodes.each do |prefix, (count, ip_start)|
+        count.times do |i|
+            hostname = "%s-%02d" % [prefix, (i+1)]
+            config.ssh.insert_key = false
+            config.vm.define "#{hostname}" do |box|
+                puts "working on #{hostname} with ip of 192.168.100.#{ip_start+i}"
+
+                box.vm.box = "centos7.0"
+                box.vm.hostname = "#{hostname}.galaxy.com"
+                box.vm.network :private_network, :ip => "192.168.100.#{ip_start+i}", :netmask => "255.255.255.0"
+            end
+
+            config.vm.define "#{hostname}" do |box|
+                box.vm.provision "install github.com/yann-y/ipfs-s3", type: "shell" do |ssh|
+                       ssh.privileged = false
+                       ssh.inline = "sudo cp /vagrant/ansible/roles/common/files/hosts /etc/hosts; cp -rf /vagrant/ansible ~/; cd ~/ansible; ./client_provision.sh"
+                end
+            end
+        end
+    end
+end

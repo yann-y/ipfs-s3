@@ -1,0 +1,7 @@
+github.com/yann-y/ipfs-s3-01   ansible_ssh_host=192.168.100.100
+
+[github.com/yann-y/ipfs-s3]
+github.com/yann-y/ipfs-s3-01
+
+[mongodb]
+github.com/yann-y/ipfs-s3-01

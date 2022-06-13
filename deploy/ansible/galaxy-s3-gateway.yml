@@ -1,0 +1,10 @@
+---
+- hosts: mongodb
+  tags: mongodb
+  roles:
+    - mongodb
+
+- hosts: github.com/yann-y/ipfs-s3
+  tags: github.com/yann-y/ipfs-s3
+  roles:
+    - github.com/yann-y/ipfs-s3

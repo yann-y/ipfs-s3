@@ -1,0 +1,12 @@
+---
+
+# Timezone and NTP
+timezone_area: Asia
+timezone_city: Shanghai
+time_server: 0.centos.pool.ntp.org
+
+deploy_user: vagrant
+deploy_group: vagrant
+squid_cache_dir: /var/spool/squid
+
+galaxy_s3_gateway_install_dir: /home/vagrant/galaxy_s3_gateway

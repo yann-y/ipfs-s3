@@ -1,0 +1,11 @@
+http:
+  server:
+    port: 8000
+
+
+db:
+  mysql:
+    host: 127.0.0.1:3306
+    user: root
+    password: mysql123456
+    database: S3

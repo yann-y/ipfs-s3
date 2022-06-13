@@ -1,0 +1,46 @@
+---
+- name: disable iptables
+  shell: sudo iptables -F
+
+- name: create go root home
+  shell: mkdir -p go/root/go-1.7.3
+
+- name: create go project home
+  shell: mkdir -p go/project/src
+
+- name: copy golang root tar
+  copy: src=go1.7.3.linux-amd64.tar.gz dest=go/root
+
+- name: untar golang root tar
+  shell: chdir=go/root tar zxvf go1.7.3.linux-amd64.tar.gz -C go-1.7.3
+
+- name: untar golang root soft link
+  shell: chdir=go/root ln -s go-1.7.3/go go
+
+- name: set go enviroment
+  shell: |
+      echo -e 'GOROOT=/home/vagrant/go/root/go\nGOPATH=/home/vagrant/go/project\nPATH=$PATH:$GOROOT/bin/\nexport GOROOT\nexport GOPATH\nexport PATH' >> /home/vagrant/.bash_profile
+
+- name: install git
+  shell: sudo yum install git -y
+
+- name: install compile tool-automake
+  shell: sudo yum install automake -y
+
+- name: install compile tool-libtool
+  shell: sudo yum install libtool -y
+
+- name: create s3-gateway home
+  shell: mkdir -p {{ galaxy_s3_gateway_install_dir }}
+
+- name: copy s3-gateway binary file
+  copy: src=github.com/yann-y/ipfs-s3.tar.gz dest={{ galaxy_s3_gateway_install_dir }}
+
+- name: untar s3-gateway
+  shell: tar zxvf {{ galaxy_s3_gateway_install_dir }}/github.com/yann-y/ipfs-s3.tar.gz -C {{ galaxy_s3_gateway_install_dir }}/
+
+- name: create s3-gateway soft link
+  shell: ln -s {{ galaxy_s3_gateway_install_dir }}/github.com/yann-y/ipfs-s3-* {{ galaxy_s3_gateway_install_dir }}/github.com/yann-y/ipfs-s3
+
+- name: start s3-gateway
+  shell: chmod +x {{ galaxy_s3_gateway_install_dir }}/github.com/yann-y/ipfs-s3/bin/github.com/yann-y/ipfs-s3 & bash {{ galaxy_s3_gateway_install_dir }}/github.com/yann-y/ipfs-s3/bin/run.sh -l {{ galaxy_s3_gateway_install_dir }}/github.com/yann-y/ipfs-s3/logs

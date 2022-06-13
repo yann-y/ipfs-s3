@@ -1,0 +1,8 @@
+[epel]
+enabled = 1
+failovermethod = priority
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+#mirrorlist = https://mirrors.fedoraproject.org/mirrorlist?repo=epel-7&arch=x86_64&country=cn
+baseurl=http://pmo02.chinac.com:8001/epel/$releasever/$basearch/
+name = Extra Packages for Enterprise Linux 7 - $basearch

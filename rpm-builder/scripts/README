@@ -1,0 +1,11 @@
+build.sh  compile_deps.sh  pre_build.sh  rpmbuild.el6.sh  rpmbuild.el7.sh
+
+1. 执行pre_build.sh下载必要的rpm包，将deps/build指向响应的arch
+   如果平台不是centos6.x或者centos7.x, 该脚本会先先调用compile_deps.sh
+
+2. 执行build.sh 编译boss系统
+
+3. 执行rpmbuild脚本编译对应的系统, 其他系统自行根据需要选用两者的spec文件
+   主要区别在使用systemd还是serveice启动系统
+
+注意，升级包并不会重启boss系统，请手动重启

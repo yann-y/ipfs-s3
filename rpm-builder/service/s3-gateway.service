@@ -1,0 +1,14 @@
+[Unit]
+Description=github.com/yann-y/ipfs-s3
+After=network.target network-online.target
+Requires=network.target
+
+[Service]
+Type=forking
+ExecStart=/opt/galaxy/galaxy-s3-gw/bin/run.sh
+ExecReload=killall github.com/yann-y/ipfs-s3 && /opt/galaxy/galaxy-s3-gw/bin/run.sh
+ExecStop=killall github.com/yann-y/ipfs-s3
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

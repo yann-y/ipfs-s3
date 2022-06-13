@@ -1,0 +1,22 @@
+---
+
+- name: delete centos's default repo
+  shell: rm {{ item }} || /bin/true
+  with_items:
+      - "/etc/yum.repos.d/puppetlabs-pc1.repo"
+      - "/etc/yum.repos.d/CentOS-CR.repo"
+      - "/etc/yum.repos.d/CentOS-Debuginfo.repo"
+      - "/etc/yum.repos.d/CentOS-fasttrack.repo"
+      - "/etc/yum.repos.d/CentOS-Sources.repo"
+      - "/etc/yum.repos.d/CentOS-Vault.repo"
+      - "/etc/yum.repos.d/epel-testing.repo"
+
+- name: disable yum plugin
+  replace: dest=/etc/yum.conf regexp="^plugins=1$" replace="plugins=0"
+
+- name: update CentOS-Base.repo file
+  copy: src={{ item }} dest=/etc/yum.repos.d/
+  with_items:
+    - "CentOS-Base.repo"
+    - "epel.repo"
+    - "CentOS-Base-163.repo"
