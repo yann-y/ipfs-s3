@@ -1,11 +1,14 @@
 http:
   server:
+    # 启动的端口
     port: 8000
-
-
 db:
   mysql:
     host: 127.0.0.1:3306
     user: root
     password: mysql123456
     database: S3
+storage:
+  # ipfs节点列表
+  model: ipfs
+  host: 127.0.0.1:5001

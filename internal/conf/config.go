@@ -1,8 +1,9 @@
 package conf
 
 type Config struct {
-	Http Http `yaml:"http"`
-	Db   Db   `yaml:"db"`
+	Http    Http    `yaml:"http"`
+	Db      Db      `yaml:"db"`
+	Storage Storage `yaml:"storage"`
 }
 
 type Db struct {
@@ -22,4 +23,9 @@ type Http struct {
 
 type Server struct {
 	Port int `yaml:"port"`
+}
+
+type Storage struct {
+	Model string `yaml:"model"`
+	Host  string `yaml:"host"`
 }
