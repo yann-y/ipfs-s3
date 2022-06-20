@@ -22,7 +22,7 @@ func SendResponseHandler(w http.ResponseWriter, r *http.Request) {
 		s3resp := resp.(handler.S3Responser)
 		w.Header().Set("x-amz-id-2", reqId)
 		w.Header().Set("x-amz-request-id", base64Encode([]byte(reqId)))
-		w.Header().Set("Server", "GalaxyS3")
+		w.Header().Set("Server", "ipfs-s3")
 		s3resp.Send(w)
 	}
 }
