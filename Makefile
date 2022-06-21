@@ -1,4 +1,4 @@
-.PHONY: all github.com/yann-y/ipfs-s3 release-version
+web.PHONY: all github.com/yann-y/ipfs-s3 release-version
 
 all: clean dist
 

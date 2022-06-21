@@ -12,6 +12,7 @@ import (
 	"github.com/yann-y/ipfs-s3/handler/common"
 	"github.com/yann-y/ipfs-s3/handler/object"
 	conf2 "github.com/yann-y/ipfs-s3/internal/conf"
+	"github.com/yann-y/ipfs-s3/internal/storage"
 	"github.com/yann-y/ipfs-s3/middleware"
 	"github.com/yann-y/ipfs-s3/mux"
 	"net/http"
@@ -148,6 +149,11 @@ func main() {
 	//if err != nil {
 	//	glog.Fatalf("init file system error: %s", err)
 	//}
+
+	err = storage.New(c.Storage)
+	if err != nil {
+		return
+	}
 
 	startServe(setupRouter())
 }

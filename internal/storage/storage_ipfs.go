@@ -3,6 +3,8 @@ package storage
 import (
 	shell "github.com/ipfs/go-ipfs-api"
 	"github.com/yann-y/ipfs-s3/internal/conf"
+	"github.com/yann-y/ipfs-s3/internal/hash"
+	"io"
 )
 
 type IpfsStorage struct {
@@ -17,4 +19,17 @@ func NewIpfsStorage(conf conf.Storage) (Provider, error) {
 func newIpfsStorage(conf conf.Storage) (*IpfsStorage, error) {
 	sh := shell.NewShell(conf.Host)
 	return &IpfsStorage{client: sh}, nil
+}
+
+func (i *IpfsStorage) PutObject(input io.Reader) (string, string, error) {
+	reader, err := hash.NewReader(input, 0, "", "", 0)
+	if err != nil {
+		return "", "", err
+	}
+	cid, err := i.client.Add(reader, shell.Pin(true))
+	if err != nil {
+		return "", "", err
+	}
+	etag := reader.ETag()
+	return cid, etag.String(), nil
 }

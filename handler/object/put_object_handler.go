@@ -3,9 +3,9 @@ package object
 import (
 	"github.com/yann-y/ipfs-s3/context"
 	"github.com/yann-y/ipfs-s3/db"
-	"github.com/yann-y/ipfs-s3/fs"
 	"github.com/yann-y/ipfs-s3/gerror"
 	"github.com/yann-y/ipfs-s3/handler"
+	"github.com/yann-y/ipfs-s3/internal/storage"
 	"github.com/yann-y/ipfs-s3/mux"
 	// "github.com/yann-y/ipfs-s3/utils/md5"
 	"errors"
@@ -87,9 +87,10 @@ func PutObjectHandler(w http.ResponseWriter, r *http.Request) {
 	objectPath := bucket + "/" + objectName
 	// keyMD5sum := md5.Sum(objectPath)
 
-	var fid, objectMd5 string
+	var cid, objectMd5 string
 	if size > 0 {
-		fid, objectMd5, err = fs.PutObject(bucket, size, r.Body, context.Get(r, "req_id").(string))
+		cid, objectMd5, err = storage.FS.PutObject(r.Body)
+		//fid, objectMd5, err = fs.PutObject(bucket, size, r.Body, context.Get(r, "req_id").(string))
 		if err != nil {
 			resp = handler.WrapS3ErrorResponseForRequest(http.StatusInternalServerError, r, "InternalError", "/"+objectPath)
 			return
@@ -98,7 +99,7 @@ func PutObjectHandler(w http.ResponseWriter, r *http.Request) {
 
 	objectMeta := &db.Object{
 		ObjectName:   objectName,
-		Fid:          fid,
+		Cid:          cid,
 		Etag:         fmt.Sprintf("%s%s%s", "\"", objectMd5, "\""),
 		Bucket:       bucketObject.BucketName,
 		Size:         size,

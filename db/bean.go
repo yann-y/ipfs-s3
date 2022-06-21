@@ -19,7 +19,7 @@ type Object struct {
 	Size            int64  `bson:"size"   gorm:"type:bigint(20);unsigned;NOT NULL"`
 	LastModified    int64  `bson:"last_modified" gorm:"type:bigint(20);unsigned;NOT NULL;index:IDX_BucketID_LastModified"`
 	ObjectName      string `bson:"object_name"   gorm:"type:varchar(512);NOT NULL"`
-	Fid             string `bson:"fid"           gorm:"type:varchar(256)"`
+	Cid             string `bson:"cid"           gorm:"type:varchar(256)"`
 	Meta            string `bson:"meta"          gorm:"type:varchar(512);NOT NULL"`
 	MultipartUpload bool   `bson:"is_multipart_upload" gorm:"type:boolean"`
 	UploadId        string `bson:"upload_id"           gorm:"type:varchar(64)"`
@@ -29,18 +29,18 @@ type Object struct {
 }
 
 type UploadInfo struct {
-	UploadID   string `bson:"_id" gorm:"type:varchar(64);not null;primary_key"`
-	StartTime  int64  `bson:"start_time" gorm:"type:bigint(20);unsigned;NOT NULL"`
-	Bucket     string `bson:"bucket" gorm:"type:varchar(64);NOT NULL"`
-	Object     string `bson:"object" gorm:"type:varchar(512);NOT NULL"`
-	UserID     string `bson:"user"   gorm:"type:varchar(64);not null;index:IDX_Owner"`
-	IsAbort    bool   `bson:"is_abort" gorm:"type:boolean;unsigned;not null"`
-	Meta       string `bson:"meta" gorm:"type:varchar(512);NOT NULL"`
+	UploadID  string `bson:"_id" gorm:"type:varchar(64);not null;primary_key"`
+	StartTime int64  `bson:"start_time" gorm:"type:bigint(20);unsigned;NOT NULL"`
+	Bucket    string `bson:"bucket" gorm:"type:varchar(64);NOT NULL"`
+	Object    string `bson:"object" gorm:"type:varchar(512);NOT NULL"`
+	UserID    string `bson:"user"   gorm:"type:varchar(64);not null;index:IDX_Owner"`
+	IsAbort   bool   `bson:"is_abort" gorm:"type:boolean;unsigned;not null"`
+	Meta      string `bson:"meta" gorm:"type:varchar(512);NOT NULL"`
 }
 
 type UploadPart struct {
 	UploadID     string `bson:"upload_id" gorm:"type:varchar(64);not null;primary_key"`
-	Fid          string `bson:"fid" gorm:"type:varchar(64);not null"`
+	cid          string `bson:"cid" gorm:"type:varchar(64);not null"`
 	Number       int    `bson:"number" gorm:"type:bigint(20);NOT NULL;primary_key"`
 	Size         int64  `bson:"size" gorm:"type:bigint(20);unsigned;NOT NULL"`
 	LastModified int64  `bson:"last_modified" gorm:"type:bigint(20);unsigned;NOT NULL"`
