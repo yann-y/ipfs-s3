@@ -172,6 +172,9 @@ func (r *Reader) ETag() etag.ETag {
 func (r *Reader) MD5() []byte {
 	return r.checksum
 }
+func (r *Reader) ReadSize() int64 {
+	return r.bytesRead
+}
 
 // MD5Current returns the MD5 checksum of the content
 // that has been read so far.

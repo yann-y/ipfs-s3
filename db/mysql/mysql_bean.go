@@ -66,7 +66,7 @@ func toMysqlObject(id, bucketId int64, orig *db.Object) *MysqlObject {
 			Size:            orig.Size,
 			Etag:            orig.Etag,
 			LastModified:    orig.LastModified,
-			Fid:             orig.Fid,
+			Cid:             orig.Cid,
 			Meta:            orig.Meta,
 			MultipartUpload: orig.MultipartUpload,
 			PartSize:        orig.PartSize,
@@ -78,7 +78,7 @@ func toMysqlObject(id, bucketId int64, orig *db.Object) *MysqlObject {
 
 func toObject(orig *MysqlObject) *db.Object {
 	return &db.Object{
-		Fid:      orig.Fid,
+		Cid:      orig.Cid,
 		Meta:     orig.Meta,
 		Size:     orig.Size,
 		Etag:     orig.Etag,

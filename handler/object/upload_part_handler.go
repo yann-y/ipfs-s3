@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/yann-y/ipfs-s3/context"
 	"github.com/yann-y/ipfs-s3/db"
-	"github.com/yann-y/ipfs-s3/fs"
 	"github.com/yann-y/ipfs-s3/gerror"
 	"github.com/yann-y/ipfs-s3/handler"
+	"github.com/yann-y/ipfs-s3/internal/storage"
 	"github.com/yann-y/ipfs-s3/mux"
 	"net/http"
 	"strconv"
@@ -138,10 +138,10 @@ func UploadPartHandler(w http.ResponseWriter, r *http.Request) {
 	//}
 
 	var (
-		fid     string
+		Cid     string
 		partMd5 string
 	)
-	fid, partMd5, err = fs.PutObject(bucket, size, r.Body, context.Get(r, "req_id").(string))
+	Cid, partMd5, err = storage.FS.PutObject(r.Body)
 	if err != nil {
 		resp = handler.WrapS3ErrorResponseForRequest(http.StatusInternalServerError, r, "InternalError", "/"+objectPath)
 		return
@@ -149,7 +149,7 @@ func UploadPartHandler(w http.ResponseWriter, r *http.Request) {
 
 	part := &db.UploadPart{
 		UploadID:     uploadId,
-		Fid:          fid,
+		Cid:          Cid,
 		Number:       partNumber,
 		Size:         size,
 		LastModified: time.Now().Unix(),

@@ -5,6 +5,7 @@ import (
 	"github.com/yann-y/ipfs-s3/db"
 	"github.com/yann-y/ipfs-s3/gerror"
 	"github.com/yann-y/ipfs-s3/handler"
+	"github.com/yann-y/ipfs-s3/internal/hash"
 	"github.com/yann-y/ipfs-s3/internal/storage"
 	"github.com/yann-y/ipfs-s3/mux"
 	// "github.com/yann-y/ipfs-s3/utils/md5"
@@ -88,15 +89,21 @@ func PutObjectHandler(w http.ResponseWriter, r *http.Request) {
 	// keyMD5sum := md5.Sum(objectPath)
 
 	var cid, objectMd5 string
-	if size > 0 {
-		cid, objectMd5, err = storage.FS.PutObject(r.Body)
-		//fid, objectMd5, err = fs.PutObject(bucket, size, r.Body, context.Get(r, "req_id").(string))
-		if err != nil {
-			resp = handler.WrapS3ErrorResponseForRequest(http.StatusInternalServerError, r, "InternalError", "/"+objectPath)
-			return
-		}
+	reader, err := hash.NewReader(r.Body, size, "", "", -1)
+	if err != nil {
+		fmt.Errorf("%v", err)
 	}
+	defer r.Body.Close()
+	cid, objectMd5, err = storage.FS.PutObject(reader)
+	//Cid, objectMd5, err = fs.PutObject(bucket, size, r.Body, context.Get(r, "req_id").(string))
 
+	if err != nil {
+		resp = handler.WrapS3ErrorResponseForRequest(http.StatusInternalServerError, r, "InternalError", "/"+objectPath)
+		return
+	}
+	if size <= 0 {
+		size = reader.ReadSize()
+	}
 	objectMeta := &db.Object{
 		ObjectName:   objectName,
 		Cid:          cid,

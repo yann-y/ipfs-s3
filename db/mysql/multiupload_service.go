@@ -40,7 +40,7 @@ func (ms *mysqlService) SetUploadAborted(uploadId string) error {
 }
 
 func (ms *mysqlService) ListUploadAllParts(uploadId string) ([]*db.UploadPart, error) {
-	scope := ms.DB.Raw("select fid, number, size, last_modified, etag from upload_parts where upload_id = ? order by number", uploadId)
+	scope := ms.DB.Raw("select Cid, number, size, last_modified, etag from upload_parts where upload_id = ? order by number", uploadId)
 	if scope.Error != nil {
 		return nil, scope.Error
 	}
@@ -53,7 +53,7 @@ func (ms *mysqlService) ListUploadAllParts(uploadId string) ([]*db.UploadPart, e
 	parts := make([]*db.UploadPart, 0)
 	for rows.Next() {
 		var part db.UploadPart
-		if err := rows.Scan(&part.Fid, &part.Number, &part.Size, &part.LastModified, &part.Etag); err != nil {
+		if err := rows.Scan(&part.Cid, &part.Number, &part.Size, &part.LastModified, &part.Etag); err != nil {
 			return nil, err
 		}
 		parts = append(parts, &part)

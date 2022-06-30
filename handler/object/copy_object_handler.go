@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"github.com/yann-y/ipfs-s3/context"
 	"github.com/yann-y/ipfs-s3/db"
-	"github.com/yann-y/ipfs-s3/fs"
+	"github.com/yann-y/ipfs-s3/internal/storage"
+
 	"github.com/yann-y/ipfs-s3/gerror"
 	"github.com/yann-y/ipfs-s3/handler"
 	"github.com/yann-y/ipfs-s3/mux"
@@ -128,16 +129,16 @@ func CopyObjectHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var reader io.Reader
-	txId := context.Get(r, "req_id").(string)
-	fid, etag := "", ""
-	if object.Fid != "" {
-		reader, err = fs.GetObject(object.Fid, txId)
+	//txId := context.Get(r, "req_id").(string)
+	Cid, etag := "", ""
+	if object.Cid != "" {
+		reader, err = storage.FS.GetObject(object.Cid)
 		if err != nil {
 			resp = handler.WrapS3ErrorResponseForRequest(http.StatusInternalServerError, r, "InternalError", srcObjectPath)
 			return
 		}
 
-		fid, etag, err = fs.PutObject(destBucketObject.UserID, object.Size, reader, txId)
+		Cid, etag, err = storage.FS.PutObject(reader)
 		if err != nil {
 			resp = handler.WrapS3ErrorResponseForRequest(http.StatusInternalServerError, r, "InternalError", srcObjectPath)
 			return
@@ -147,7 +148,7 @@ func CopyObjectHandler(w http.ResponseWriter, r *http.Request) {
 	// keyMD5sum := md5.Sum(destObjectFullPath)
 	objectMeta := &db.Object{
 		ObjectName: mux.Vars(r)["object"],
-		Fid:        fid,
+		Cid:        Cid,
 		//KeyMd5High:    md5.MD5High(keyMD5sum),
 		//KeyMd5Low:     md5.MD5Low(keyMD5sum),
 		//ConflictFlag:  0,

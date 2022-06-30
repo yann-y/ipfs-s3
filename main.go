@@ -123,7 +123,7 @@ func main() {
 	flag.Parse()
 	config := viper.New()
 	config.AddConfigPath("configs")
-	config.SetConfigName("config")
+	config.SetConfigName("config.yaml")
 	config.SetConfigType("yaml")
 	if err := config.ReadInConfig(); err != nil {
 		panic(err)

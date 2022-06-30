@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"github.com/yann-y/ipfs-s3/context"
 	"github.com/yann-y/ipfs-s3/db"
-	"github.com/yann-y/ipfs-s3/fs"
 	"github.com/yann-y/ipfs-s3/gerror"
 	"github.com/yann-y/ipfs-s3/handler"
+	"github.com/yann-y/ipfs-s3/internal/storage"
 	"github.com/yann-y/ipfs-s3/mux"
 	"io/ioutil"
 	"net/http"
@@ -168,30 +168,26 @@ func CompleteMultipartUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	partSize := uploadedParts[0].Size
 	size := int64(0)
-	fids, etags := "", ""
+	Cids, etags := "", ""
 
-	// 如果part数量过多,fids可能会很长,此处进行了优化:
-	// 将拼接后的fids再写入底层GalaxyFS,得到的fid再作为该对象的最终file id
+	// 如果part数量过多,Cids可能会很长,此处进行了优化:
+	// 将拼接后的Cids再写入底层GalaxyFS,得到的Cid再作为该对象的最终file id
 	// 这样在读入的时候需要判断出对象是通过普通上传还是Multiupload方式上传,因此需要在数据库记录该信息
 	// TODO: 将客户端上传的Part的Etag拼接起来计算而得的MD5作为object的md5
 	for _, part := range uploadedParts {
 		size = size + part.Size
-		fids = fids + part.Fid + ","
+		Cids = Cids + part.Cid + ","
 		etags = etags + part.Etag
 	}
 
 	hash := md5.Sum([]byte(etags))
 	objectEtag := hex.EncodeToString(hash[:])
 
-	// 去掉fids最后的','
-	fids = strings.TrimSuffix(fids, ",")
+	// 去掉Cids最后的','
+	Cids = strings.TrimSuffix(Cids, ",")
 
-	var objectFid string
-	objectFid, _, err = fs.PutObject(
-		bucketObject.UserID,
-		int64(len(fids)),
-		strings.NewReader(fids),
-		context.Get(r, "req_id").(string))
+	var objectCid string
+	objectCid, _, err = storage.FS.PutObject(strings.NewReader(Cids))
 	if err != nil {
 		resp = handler.WrapS3ErrorResponseForRequest(http.StatusInternalServerError, r, "InternalError", "/"+objectPath)
 		return
@@ -203,7 +199,7 @@ func CompleteMultipartUploadHandler(w http.ResponseWriter, r *http.Request) {
 		Size:            size,
 		Etag:            fmt.Sprintf("%s%s%s", "\"", objectEtag, "\""),
 		Bucket:          bucket,
-		Fid:             objectFid,
+		Cid:             objectCid,
 		MultipartUpload: true,
 		UploadId:        uploadId,
 		PartSize:        partSize,

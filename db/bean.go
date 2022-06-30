@@ -40,7 +40,7 @@ type UploadInfo struct {
 
 type UploadPart struct {
 	UploadID     string `bson:"upload_id" gorm:"type:varchar(64);not null;primary_key"`
-	cid          string `bson:"cid" gorm:"type:varchar(64);not null"`
+	Cid          string `bson:"cid" gorm:"type:varchar(64);not null"`
 	Number       int    `bson:"number" gorm:"type:bigint(20);NOT NULL;primary_key"`
 	Size         int64  `bson:"size" gorm:"type:bigint(20);unsigned;NOT NULL"`
 	LastModified int64  `bson:"last_modified" gorm:"type:bigint(20);unsigned;NOT NULL"`

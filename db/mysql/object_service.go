@@ -203,7 +203,7 @@ func (ms *mysqlService) updateMeta(tx *gorm.DB, meta *MysqlObject) (Action, erro
 		// Md5High:       existingObj.Md5High,
 		// Md5Low:        existingObj.Md5Low,
 		Object: db.Object{
-			Fid:      existingObj.Fid,
+			Cid:      existingObj.Cid,
 			Meta:     existingObj.Meta,
 			Size:     existingObj.Size,
 			Etag:     existingObj.Etag,
@@ -231,7 +231,7 @@ func (ms *mysqlService) updateMeta(tx *gorm.DB, meta *MysqlObject) (Action, erro
 	//newMeta := &MysqlObject{
 	//	ObjectName:    meta.ObjectName,
 	//	BucketID:      meta.BucketID,
-	//	Fid:           meta.Fid,
+	//	Cid:           meta.Cid,
 	//	ObjectID:      meta.ObjectID,
 	//	Size:          meta.Size,
 	//	Md5High:       meta.Md5High,
@@ -282,7 +282,7 @@ func (ms *mysqlService) DeleteObject(bucket, object, version string, versionEnab
 		// Md5High:       obj.Md5High,
 		// Md5Low:        obj.Md5Low,
 		Object: db.Object{
-			Fid:      obj.Fid,
+			Cid:      obj.Cid,
 			Meta:     obj.Meta,
 			Size:     obj.Size,
 			Etag:     obj.Etag,

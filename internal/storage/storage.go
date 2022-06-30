@@ -9,6 +9,7 @@ var FS Provider
 
 type Provider interface {
 	PutObject(input io.Reader) (string, string, error)
+	GetObject(cid string) (io.Reader, error)
 }
 type Constructor func() (Provider, error)
 

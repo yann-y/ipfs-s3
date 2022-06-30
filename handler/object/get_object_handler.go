@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/yann-y/ipfs-s3/context"
 	"github.com/yann-y/ipfs-s3/db"
-	"github.com/yann-y/ipfs-s3/fs"
 	"github.com/yann-y/ipfs-s3/gerror"
 	"github.com/yann-y/ipfs-s3/handler"
+	"github.com/yann-y/ipfs-s3/internal/storage"
 	"github.com/yann-y/ipfs-s3/mux"
 	"io"
 	"math"
@@ -141,39 +141,39 @@ func GetObjectHandler(w http.ResponseWriter, r *http.Request) {
 		rangeEnd = object.Size
 	}
 
-	var reader io.ReadSeeker
-	reader, err = fs.GetObject(object.Fid, context.Get(r, "req_id").(string))
+	var reader io.Reader
+	reader, err = storage.FS.GetObject(object.Cid)
 	if err != nil {
 		resp = handler.WrapS3ErrorResponseForRequest(http.StatusInternalServerError, r, "InternalError", objectPath)
 		return
 	}
 
 	// 如果对象是通过multipart upload方式上传
-	// 首先需要读出所有part的fid,保存于fidArray
+	// 首先需要读出所有part的Cid,保存于CidArray
 	contents := make([]io.Reader, 0)
 	if object.MultipartUpload {
-		fids := string(handler.StreamToByte(reader))
-		fidArray := strings.Split(fids, ",")
-		for i, fid := range fidArray {
+		Cids := string(handler.StreamToByte(reader))
+		CidArray := strings.Split(Cids, ",")
+		for i, Cid := range CidArray {
 			partRangeStart := int64(i) * partSize
 			partRangeEnd := int64(i+1) * partSize
 			// 如果请求的range不在part范围之内,忽略该part,无需读取
 			if rangeStart > partRangeEnd || rangeEnd < partRangeStart {
 				continue
 			}
-			reader, err = fs.GetObject(fid, context.Get(r, "req_id").(string))
+			reader, err = storage.FS.GetObject(Cid)
 			if err != nil {
 				resp = handler.WrapS3ErrorResponseForRequest(http.StatusInternalServerError, r, "InternalError", objectPath)
 				return
 			}
-			reader.Seek(max(0, rangeStart-partRangeStart), io.SeekStart)
-			lm := &io.LimitedReader{R: reader, N: min(rangeEnd, partRangeEnd) - partRangeStart}
-			contents = append(contents, lm)
+			//reader.Seek(max(0, rangeStart-partRangeStart), io.SeekStart)
+			//lm := &io.LimitedReader{R: reader, N: min(rangeEnd, partRangeEnd) - partRangeStart}
+			//contents = append(contents, lm)
 		}
 	} else {
-		reader.Seek(rangeStart, io.SeekStart)
-		lm := &io.LimitedReader{R: reader, N: rangeEnd - rangeStart}
-		contents = append(contents, lm)
+		//reader.Seek(rangeStart, io.SeekStart)
+		//lm := &io.LimitedReader{R: reader, N: rangeEnd - rangeStart}
+		//contents = append(contents, lm)
 	}
 	resp = wrapSimpleS3Response(rangeEnd-rangeStart, object.Etag, contents)
 	return
