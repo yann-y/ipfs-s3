@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/golang/glog"
 	"github.com/spf13/viper"
 	"github.com/yann-y/ipfs-s3/context"
 	"github.com/yann-y/ipfs-s3/db"
@@ -12,6 +11,7 @@ import (
 	"github.com/yann-y/ipfs-s3/handler/common"
 	"github.com/yann-y/ipfs-s3/handler/object"
 	conf2 "github.com/yann-y/ipfs-s3/internal/conf"
+	"github.com/yann-y/ipfs-s3/internal/logger"
 	"github.com/yann-y/ipfs-s3/internal/storage"
 	"github.com/yann-y/ipfs-s3/middleware"
 	"github.com/yann-y/ipfs-s3/mux"
@@ -109,7 +109,7 @@ func startServe(router *mux.Router) {
 	//}()
 	err := http.ListenAndServe(":"+listenAddr, context.ClearHandler(router))
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err)
 		return
 	}
 }
@@ -126,11 +126,11 @@ func main() {
 	config.SetConfigName("config.yaml")
 	config.SetConfigType("yaml")
 	if err := config.ReadInConfig(); err != nil {
-		panic(err)
+		logger.Panicf("读取配置文件失败  ==》 %v", err)
 	}
 	var c conf2.Config
 	if err := config.Unmarshal(&c); err != nil {
-		fmt.Println(err)
+		logger.Panicf("配置文件序列化失败错误  ==》 %v", err)
 	}
 	dbUser := c.Db.Mysql.User
 	dbPassword := c.Db.Mysql.Password
@@ -142,18 +142,13 @@ func main() {
 	// 使用mysql作为后端存储,集群地址为192.168.100.100
 	err := db.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", dbUser, dbPassword, dbAddr, dbName))
 	if err != nil {
-		glog.Fatalf("init database error: %s", err)
+		logger.Fatalf("init database error: %s", err)
 	}
-
-	//err = fs.InitFS(*gfsMaster, *schedulerPath)
-	//if err != nil {
-	//	glog.Fatalf("init file system error: %s", err)
-	//}
 
 	err = storage.New(c.Storage)
 	if err != nil {
+		logger.Fatalf("init Storage error: %s", err)
 		return
 	}
-
 	startServe(setupRouter())
 }
