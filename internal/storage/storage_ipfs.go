@@ -5,6 +5,7 @@ import (
 	shell "github.com/ipfs/go-ipfs-api"
 	"github.com/yann-y/ipfs-s3/internal/conf"
 	"github.com/yann-y/ipfs-s3/internal/hash"
+	"github.com/yann-y/ipfs-s3/internal/logger"
 	"io"
 )
 
@@ -25,7 +26,7 @@ func newIpfsStorage(conf conf.Storage) (*IpfsStorage, error) {
 func (i *IpfsStorage) PutObject(input io.Reader) (string, string, error) {
 	reader, err := hash.NewReader(input, -1, "", "", -1)
 	if err != nil {
-		fmt.Errorf("%v", err)
+		logger.Errorf("%v", err)
 		return "", "", err
 	}
 	cid, err := i.client.Add(reader, shell.Pin(true))
@@ -37,6 +38,5 @@ func (i *IpfsStorage) PutObject(input io.Reader) (string, string, error) {
 	return cid, etag.String(), nil
 }
 func (i *IpfsStorage) GetObject(cid string) (io.Reader, error) {
-
-	return nil, nil
+	return i.client.Cat(cid)
 }
